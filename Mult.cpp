@@ -1,14 +1,21 @@
 #include <iostream>
 #include <string>
+#include <algorithm>
 using namespace std;
 
+void mult(string&, string&, string&);
 void shift(string&, string&, int&);
 string sum(string, string);
 string complement(string);
+string decimalToBinary(string);
 
 int main() {
     string M, Q;
-    int count;
+    int formato;
+    cout << "Formato para agregar los números: " << endl;
+    cout << "1) Binario" << endl;
+    cout << "2) Decimal" << endl;
+    cin >> formato;
 
     cout << "Ingrese el multiplicando (M): ";
     cin >> M;
@@ -16,28 +23,13 @@ int main() {
     cout << "Ingrese el multiplicador (Q): ";
     cin >> Q;
 
-    int Q_1 = 0;
-
-    string A(Q.length(), '0');
-    count = Q.length();
-    while (count != 0) {
-        if (stoi(string(1,Q[Q.length() - 1])) == Q_1) {
-            shift(A, Q, Q_1);
-        }
-        else if (stoi(string(1,Q[Q.length() - 1])) == 0 && Q_1 == 1) {
-            // A + M 
-            A = sum(A, M);
-            shift(A, Q, Q_1);
-
-        }
-        else {
-            // A - M
-            A = sum(A, complement(M));
-            shift(A, Q, Q_1);
-        }
-        count--;
+    if (!formato) {
+        M = decimalToBinary(M);
+        Q = decimalToBinary(Q);
     }
 
+    string A(Q.length(), '0');
+    mult(M, Q, A);
     cout << "Respuesta: " << A << Q;
 }
 
@@ -54,7 +46,7 @@ string complement(string binario) {
             complement += '1';
         }
     }
-    complement = sum(complement, temp);
+    complement = sum(complement, temp); // Sumar uno 
     return complement;
 }
 
@@ -81,3 +73,51 @@ void shift(string& A, string& Q, int& Q_1) {
     Q = A.back() + Q.substr(0, Q.length() - 1);
     A = A[0] + A.substr(0, A.length() - 1);
 }
+
+string decimalToBinary(string str) {
+    string bin;
+    int decimal = stoi(str);
+    int residuo;
+
+    bool neq = (decimal < 0) ? true : false;
+    decimal = abs(decimal);
+
+    while (decimal > 0) {
+        residuo = decimal % 2;
+        bin += to_string(residuo);
+        decimal = decimal / 2;
+    }
+
+    bin += "0"; // Auxiliar
+    reverse(bin.begin(),bin.end());
+    if (neq) {
+        bin = complement(bin);
+    }
+    
+    return bin;
+}
+
+void mult(string& M, string& Q, string& A) {
+    int count = Q.length();
+    int Q_1 = 0;
+    int lastDigit_Q;
+    while (count != 0) {
+        lastDigit_Q = stoi(string(1,Q[Q.length() - 1]));
+
+        if (lastDigit_Q == Q_1) {
+            shift(A, Q, Q_1);
+        }
+        else if (lastDigit_Q == 0 && Q_1 == 1) {
+            // A + M 
+            A = sum(A, M);
+            shift(A, Q, Q_1);
+        }
+        else {
+            // A - M
+            A = sum(A, complement(M));
+            shift(A, Q, Q_1);
+        }
+        count--;
+    }
+}
+
