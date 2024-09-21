@@ -3,19 +3,26 @@
 #include <algorithm>
 using namespace std;
 
+string extensor(string, int);
 void mult(string&, string&, string&);
 void shift(string&, string&, int&);
 string sum(string, string);
 string complement(string);
-string decimalToBinary(string);
+string decimalToBinary(string); // Complemento a dos
 
 int main() {
     string M, Q;
     int formato;
-    cout << "Formato para agregar los números: " << endl;
+    cout << "--- Menu --- " << endl;
     cout << "1) Binario" << endl;
     cout << "2) Decimal" << endl;
+    cout << "Elija un formato para el numero: ";
     cin >> formato;
+
+    if (formato != 2 && formato != 1) {
+        cout << "Opcion invalida";
+        return 0; 
+    }
 
     cout << "Ingrese el multiplicando (M): ";
     cin >> M;
@@ -23,12 +30,17 @@ int main() {
     cout << "Ingrese el multiplicador (Q): ";
     cin >> Q;
 
-    if (!formato) {
+    if (formato == 2) {
         M = decimalToBinary(M);
         Q = decimalToBinary(Q);
     }
 
-    string A(Q.length(), '0');
+    if (M.length() != Q.length()) {
+        M = extensor(M, max(M.length(), Q.length()));
+        Q = extensor(Q, max(M.length(), Q.length()));
+    }
+
+    string A(Q.length(), '0'); // Cadena auxiliar
     mult(M, Q, A);
     cout << "Respuesta: " << A << Q;
 }
@@ -38,7 +50,7 @@ string complement(string binario) {
     string temp(binario.length(), '0');
     temp.back() = '1';
 
-    for (char bit : binario) {
+    for (char bit : binario) { // Negar
         if (bit == '1') {
             complement += '0';
         }
@@ -68,7 +80,7 @@ string sum(string binary1, string binary2) {
 }
 
 void shift(string& A, string& Q, int& Q_1) {
-    Q_1 = stoi(string(1,Q.back()));
+    Q_1 = stoi(string(1, Q.back()));
 
     Q = A.back() + Q.substr(0, Q.length() - 1);
     A = A[0] + A.substr(0, A.length() - 1);
@@ -88,12 +100,12 @@ string decimalToBinary(string str) {
         decimal = decimal / 2;
     }
 
-    bin += "0"; // Auxiliar
-    reverse(bin.begin(),bin.end());
+    bin += "0"; // signo
+    reverse(bin.begin(), bin.end());
     if (neq) {
         bin = complement(bin);
     }
-    
+
     return bin;
 }
 
@@ -102,7 +114,7 @@ void mult(string& M, string& Q, string& A) {
     int Q_1 = 0;
     int lastDigit_Q;
     while (count != 0) {
-        lastDigit_Q = stoi(string(1,Q[Q.length() - 1]));
+        lastDigit_Q = stoi(string(1, Q[Q.length() - 1]));
 
         if (lastDigit_Q == Q_1) {
             shift(A, Q, Q_1);
@@ -119,5 +131,12 @@ void mult(string& M, string& Q, string& A) {
         }
         count--;
     }
+}
+
+string extensor(string bin, int len) {
+    while (bin.length() != len) {
+        bin = bin[0] + bin;
+    }
+    return bin;
 }
 
