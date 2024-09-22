@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <cmath>
 using namespace std;
 
 string extensor(string, int);
@@ -9,6 +10,7 @@ void shift(string&, string&, int&);
 string sum(string, string);
 string complement(string);
 string decimalToBinary(string); // Complemento a dos
+int binaryToDecimal(string);
 
 int main() {
     string M, Q;
@@ -16,7 +18,7 @@ int main() {
     cout << "--- Menu --- " << endl;
     cout << "1) Binario" << endl;
     cout << "2) Decimal" << endl;
-    cout << "Elija un formato para el numero: ";
+    cout << "Elija un formato para los numeros: ";
     cin >> formato;
 
     if (formato != 2 && formato != 1) {
@@ -31,18 +33,30 @@ int main() {
     cin >> Q;
 
     if (formato == 2) {
+        cout << endl << "--- Conversion --- " << endl <<"M: ";
         M = decimalToBinary(M);
+        cout << M << endl << "Q: ";
         Q = decimalToBinary(Q);
+        cout << Q << endl;
+    } else {
+        // cout << "M decimal: " << M << " | " << binaryToDecimal(M) << endl;
+        // cout << "Q decimal: " << Q << " | " << binaryToDecimal(Q) << endl;
+        cout << endl << "M decimal: " << binaryToDecimal(M);
+        cout << endl << "Q decimal: " << binaryToDecimal(Q) << endl;
     }
 
     if (M.length() != Q.length()) {
+        cout << endl << "--- Extension --- " << endl << "M: ";
         M = extensor(M, max(M.length(), Q.length()));
+        cout << M << endl << "Q: ";
         Q = extensor(Q, max(M.length(), Q.length()));
+        cout << Q << endl;
     }
 
     string A(Q.length(), '0'); // Cadena auxiliar
     mult(M, Q, A);
-    cout << "Respuesta: " << A << Q;
+    cout << endl <<"Respuesta binario: " << A << Q;
+    cout << endl <<"Respuesta decimal: " << binaryToDecimal(A+Q);
 }
 
 string complement(string binario) {
@@ -113,8 +127,12 @@ void mult(string& M, string& Q, string& A) {
     int count = Q.length();
     int Q_1 = 0;
     int lastDigit_Q;
+
+    cout << endl <<"--- Inicio de la multiplicacion --- " << endl;
+    cout << "A: " << A << ", Q: " << Q << ", Q_1: " << Q_1 << ", M: " << M << endl;
+
     while (count != 0) {
-        lastDigit_Q = stoi(string(1, Q[Q.length() - 1]));
+        lastDigit_Q = stoi(string(1, Q[Q.length() - 1])); // cadena a entero
 
         if (lastDigit_Q == Q_1) {
             shift(A, Q, Q_1);
@@ -130,6 +148,7 @@ void mult(string& M, string& Q, string& A) {
             shift(A, Q, Q_1);
         }
         count--;
+        cout << "A: " << A << ", Q: " << Q << ", Q_1: " << Q_1 << ", M: " << M <<  endl;
     }
 }
 
@@ -140,3 +159,25 @@ string extensor(string bin, int len) {
     return bin;
 }
 
+int binaryToDecimal(string binary) {
+    int decimal = 0;
+    int power = 0;
+    bool neq = false;
+
+    if (binary[0] == '1') {
+        neq = true;
+    }
+
+    for(int i = binary.length() - 1; i >= 0; i--) {
+        if (binary[i] == '1') {
+            decimal += pow(2,power);
+        }
+        power++;
+    }
+
+    if (neq) {
+        decimal = decimal - pow(2, binary.length());
+    }
+
+    return decimal;
+}
